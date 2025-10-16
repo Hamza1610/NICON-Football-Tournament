@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-nicon-charcoal text-white font-sans;
+  }
+}
+
+@layer utilities {
+  .glow-green {
+    box-shadow: 0 0 20px rgba(0, 107, 63, 0.5);
+  }
+
+  .glow-yellow {
+    box-shadow: 0 0 20px rgba(255, 208, 70, 0.5);
+  }
+}

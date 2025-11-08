@@ -194,6 +194,24 @@ CREATE INDEX IF NOT EXISTS idx_match_events_player_id ON match_events(player_id)
 CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
 
+
+-- Create a function that bypasses RLS
+CREATE OR REPLACE FUNCTION is_user_admin(user_id uuid)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER -- Bypasses RLS
+AS $$
+DECLARE
+  is_admin boolean;
+BEGIN
+  SELECT role = 'admin' INTO is_admin
+  FROM users
+  WHERE id = user_id;
+  
+  RETURN COALESCE(is_admin, false);
+END;
+$$;
+
 -- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
@@ -215,16 +233,21 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
 
+-- CREATE POLICY "Admins can manage all users"
+--   ON users FOR ALL
+--   TO authenticated
+--   USING (
+--     EXISTS (
+--       SELECT 1 FROM users
+--       WHERE users.id = auth.uid() AND users.role = 'admin'
+--     )
+--   );
+
 CREATE POLICY "Admins can manage all users"
   ON users FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM users
-      WHERE users.id = auth.uid() AND users.role = 'admin'
-    )
-  );
-
+  USING (is_user_admin(auth.uid()));CREATE
+  
 -- RLS Policies for teams table
 CREATE POLICY "Anyone can view teams"
   ON teams FOR SELECT

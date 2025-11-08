@@ -227,6 +227,12 @@ CREATE POLICY "Users can view all profiles"
   TO authenticated
   USING (true);
 
+-- Add this new policy for inserting own profile
+CREATE POLICY "Users can insert own profile"
+  ON users FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
+
 CREATE POLICY "Users can update own profile"
   ON users FOR UPDATE
   TO authenticated
@@ -246,8 +252,8 @@ CREATE POLICY "Users can update own profile"
 CREATE POLICY "Admins can manage all users"
   ON users FOR ALL
   TO authenticated
-  USING (is_user_admin(auth.uid()));CREATE
-  
+  USING (is_user_admin(auth.uid()));
+
 -- RLS Policies for teams table
 CREATE POLICY "Anyone can view teams"
   ON teams FOR SELECT

@@ -8,7 +8,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
+export const auth = supabase.auth;
 export type UserRole = 'fan' | 'player' | 'admin';
 export type PaymentStatus = 'pending' | 'verified' | 'failed';
 export type MatchStatus = 'upcoming' | 'live' | 'finished';

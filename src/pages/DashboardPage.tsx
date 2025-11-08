@@ -2,17 +2,30 @@ import { useAuth } from '../context/AuthContext';
 import { Trophy, Calendar, BarChart3, User as UserIcon } from 'lucide-react';
 import Tabs, { Tab } from '../components/Tabs';
 import Card from '../components/Card';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { loading } = useAuth();
+
+    // useEffect to check authentication status after component mounts
+  useEffect(() => {
+    // Check only *after* the initial loading state from context is complete
+    if (!loading) {
+      // If loading is done and user is still null, navigate to login
+      if (!user) {
+        // console.log("No user found after loading, redirecting to login");
+        // navigate('/login', { replace: true }); // Use navigate instead of <Navigate>
+      }
+    }
+    // The effect depends on 'user' and 'loading' from the context.
+    // It will re-run if these values change.
+  }, [user, loading, navigate]); // Include navigate in the dependency array
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
   }
 
   const tabs: Tab[] = [
@@ -62,41 +75,41 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <div>
                 <span className="text-gray-400">Name:</span>
-                <span className="ml-2 text-white font-semibold">{user.full_name}</span>
+                <span className="ml-2 text-white font-semibold">{user?.full_name}</span>
               </div>
               <div>
                 <span className="text-gray-400">Email:</span>
-                <span className="ml-2 text-white">{user.email}</span>
+                <span className="ml-2 text-white">{user?.email}</span>
               </div>
               <div>
                 <span className="text-gray-400">Role:</span>
-                <span className="ml-2 text-white capitalize">{user.role}</span>
+                <span className="ml-2 text-white capitalize">{user?.role}</span>
               </div>
-              {user.position && (
+              {user?.position && (
                 <div>
                   <span className="text-gray-400">Position:</span>
-                  <span className="ml-2 text-white">{user.position}</span>
+                  <span className="ml-2 text-white">{user?.position}</span>
                 </div>
               )}
-              {user.jersey_number && (
+              {user?.jersey_number && (
                 <div>
                   <span className="text-gray-400">Jersey Number:</span>
-                  <span className="ml-2 text-white">#{user.jersey_number}</span>
+                  <span className="ml-2 text-white">#{user?.jersey_number}</span>
                 </div>
               )}
               <div>
                 <span className="text-gray-400">Payment Status:</span>
                 <span className={`ml-2 font-semibold ${
-                  user.payment_status === 'verified' ? 'text-green-500' :
-                  user.payment_status === 'pending' ? 'text-yellow-500' : 'text-red-500'
+                  user?.payment_status === 'verified' ? 'text-green-500' :
+                  user?.payment_status === 'pending' ? 'text-yellow-500' : 'text-red-500'
                 }`}>
-                  {user.payment_status.toUpperCase()}
+                  {user?.payment_status.toUpperCase()}
                 </span>
               </div>
             </div>
           </Card>
 
-          {user.payment_status === 'pending' && (
+          {user?.payment_status === 'pending' && (
             <Card className="bg-yellow-500/10 border border-yellow-500">
               <p className="text-yellow-500 font-semibold mb-2">Payment Required</p>
               <p className="text-gray-300 text-sm">
@@ -113,7 +126,7 @@ export default function DashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
-          Welcome back, <span className="text-nicon-green">{user.full_name}</span>!
+          Welcome back, <span className="text-nicon-green">{user?.full_name}</span>!
         </h1>
         <p className="text-gray-400">Manage your tournament experience from your dashboard</p>
       </div>

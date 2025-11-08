@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { supabase, auth } from '../lib/supabase';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { LogIn, Mail, Lock } from 'lucide-react';
@@ -18,10 +18,15 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+
+      console.log('Attempting to log in with:', { email, password });
+
+      const { data, error } = await auth.signInWithPassword({
         email,
         password,
       });
+
+      console.log('Auth State:', { data , error });
 
       if (error) throw error;
 

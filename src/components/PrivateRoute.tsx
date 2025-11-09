@@ -1,28 +1,39 @@
-// File: src/components/PrivateRoute.tsx (or .jsx)
-import { useAuth } from '../context/AuthContext'; // Adjust path as needed
+import { useAuth } from '../context/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import { ReactElement } from 'react';
+import Loader from './Loader';
 
 interface PrivateRouteProps {
-  children: ReactElement; // The component to render if authenticated
+  children: ReactElement;
 }
 
+/**
+ * PrivateRoute component protects routes that require authentication.
+ * It checks for a valid session (not user profile) since session is available
+ * immediately after login, while user profile loads asynchronously.
+ */
 export default function PrivateRoute({ children }: PrivateRouteProps) {
-  const { user, loading } = useAuth();
-//   const location = useLocation(); // Get the current location
+  const { session, loading, setLoading } = useAuth();
+  const location = useLocation();
 
-  // If auth is still loading, you might want to show a spinner or similar
-  // Alternatively, you could show nothing, or a skeleton layout matching your dashboard
+  // Show loading spinner while checking initial session
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    console.log("Loading...: ", session, loading);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
 
-  // If user is not authenticated after loading is complete, redirect to login
-  // Pass the current location in state so we can redirect back after login if desired
-//   if (!user) {
-//     return <Navigate to="/login" state={{ from: location }} replace />;
-//   }
+  // If no session exists after loading is complete, redirect to login
+  // Pass the current location so we can redirect back after login
+  if (!session) {
+    console.log("No session...: ", session, loading); 
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-  // If user is authenticated, render the protected children
+
+  // User has a valid session, render the protected route
   return children;
 }

@@ -11,13 +11,13 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { user, signOut, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader size="lg" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <Loader size="lg" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen flex flex-col">

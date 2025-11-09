@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -18,6 +19,16 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { session, loading: authLoading } = useAuth();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (!authLoading && session) {
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [session, authLoading, navigate, location]);
 
   const positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
 
@@ -51,30 +62,67 @@ export default function RegisterPage() {
         password: formData.password,
       });
 
+      console.log("Data...: ", authData);
       if (authError) throw authError;
 
       if (authData.user) {
-        const { error: profileError } = await supabase.from('users').insert({
-          id: authData.user.id,
-          full_name: formData.fullName,
-          email: formData.email,
-          role: 'player',
-          age: parseInt(formData.age),
-          position: formData.position,
-          jersey_number: parseInt(formData.jerseyNumber),
-          payment_status: 'pending',
-        });
+        // Check if session exists (email confirmation might be required)
+        if (authData.session) {
+          // Session exists - insert profile immediately
+          const { error: profileError } = await supabase.from('users').insert({
+            id: authData.user.id,
+            full_name: formData.fullName,
+            email: formData.email,
+            role: 'player',
+            age: parseInt(formData.age),
+            position: formData.position,
+            jersey_number: parseInt(formData.jerseyNumber),
+            payment_status: 'pending',
+          });
 
-        if (profileError) throw profileError;
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+            throw profileError;
+          }
 
-        navigate('/dashboard');
+          // Session is set immediately by Supabase, and AuthContext will update via onAuthStateChange
+          // Navigate to dashboard
+          navigate('/dashboard', { replace: true });
+        } else {
+          // No session - email confirmation required
+          // Store registration data temporarily for profile creation after email confirmation
+          sessionStorage.setItem('pendingRegistration', JSON.stringify({
+            userId: authData.user.id,
+            fullName: formData.fullName,
+            email: formData.email,
+            age: parseInt(formData.age),
+            position: formData.position,
+            jerseyNumber: parseInt(formData.jerseyNumber),
+          }));
+
+          setError('Please check your email to confirm your account before logging in.');
+          setLoading(false);
+          // Optionally navigate to a "check your email" page or show success message
+        }
       }
     } catch (err: any) {
+      console.log("Err: ", err);
       setError(err.message || 'Failed to register');
-    } finally {
       setLoading(false);
     }
   };
+
+  // Show loading while checking auth state
+  // if (authLoading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="w-12 h-12 border-4 border-gray-700 border-t-nicon-green rounded-full animate-spin mx-auto mb-4" />
+  //         <p className="text-gray-400">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">

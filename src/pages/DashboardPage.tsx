@@ -2,30 +2,20 @@ import { useAuth } from '../context/AuthContext';
 import { Trophy, Calendar, BarChart3, User as UserIcon } from 'lucide-react';
 import Tabs, { Tab } from '../components/Tabs';
 import Card from '../components/Card';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import Loader from '../components/Loader';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { loading } = useAuth();
+  const { user, profileLoading } = useAuth();
 
-    // useEffect to check authentication status after component mounts
-  useEffect(() => {
-    // Check only *after* the initial loading state from context is complete
-    if (!loading) {
-      // If loading is done and user is still null, navigate to login
-      if (!user) {
-        // console.log("No user found after loading, redirecting to login");
-        // navigate('/login', { replace: true }); // Use navigate instead of <Navigate>
-      }
-    }
-    // The effect depends on 'user' and 'loading' from the context.
-    // It will re-run if these values change.
-  }, [user, loading, navigate]); // Include navigate in the dependency array
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  // Show loading state only while profile is being fetched
+  // Session is already verified by PrivateRoute, so we can render the page
+  // even if profile is still loading
+  if (profileLoading && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   const tabs: Tab[] = [

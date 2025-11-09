@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { supabase, auth } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { LogIn, Mail, Lock } from 'lucide-react';
@@ -11,6 +12,18 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { session, loading: authLoading , user} = useAuth();
+
+  // Redirect to dashboard if already logged in
+  // useEffect(() => {
+
+    
+  //   if (!authLoading && session) {
+  //     const from = (location.state as any)?.from?.pathname || '/dashboard';
+  //     navigate(from, { replace: true });
+  //   }
+  // }, [session, authLoading, navigate, location]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,27 +31,36 @@ export default function LoginPage() {
     setError('');
 
     try {
-
-      console.log('Attempting to log in with:', { email, password });
-
-      const { data, error } = await auth.signInWithPassword({
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log('Auth State:', { data , error });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
-      if (data.session) {
-        navigate('/dashboard');
-      }
+      // Session is set immediately by Supabase, and AuthContext will update via onAuthStateChange
+      // Navigate to the intended page or dashboard
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
     } catch (err: any) {
       setError(err.message || 'Failed to login');
-    } finally {
       setLoading(false);
     }
+    // Note: Don't setLoading(false) on success as we're navigating away
   };
+
+  // Show loading while checking auth state
+  // if (authLoading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="w-12 h-12 border-4 border-gray-700 border-t-nicon-green rounded-full animate-spin mx-auto mb-4" />
+  //         <p className="text-gray-400">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">

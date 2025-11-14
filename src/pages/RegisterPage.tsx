@@ -278,6 +278,10 @@ export default function RegisterPage() {
                 After registration, you'll need to complete a ₦5,000 payment to activate your account
                 and participate in the tournament.
               </p>
+              <Link
+                to="/payment"
+                type="submit"
+                className="w-full py-3 rounded-lg font-semibold transition-all">Pay for Registration</Link>
             </div>
 
             <Button

@@ -3,6 +3,7 @@ import { Trophy, Calendar, BarChart3, User as UserIcon } from 'lucide-react';
 import Tabs, { Tab } from '../components/Tabs';
 import Card from '../components/Card';
 import Loader from '../components/Loader';
+import { Link } from 'react-router-dom';
 
 export default function DashboardPage() {
   const { user, profileLoading } = useAuth();
@@ -106,10 +107,10 @@ export default function DashboardPage() {
               <p className="text-gray-300 text-sm">
                 Complete your ₦5,000 registration payment to activate your account and participate in the tournament.
               </p>
-              <button
+              <Link
+                to="/payment"
                 type="submit"
-                className="w-full py-3 rounded-lg font-semibold transition-all">
-              </button>
+                className="w-full py-3 rounded-lg font-semibold transition-all">Pay for Registration</Link>
             </Card>
           )}
         </div>

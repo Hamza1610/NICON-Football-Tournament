@@ -102,9 +102,14 @@ export default function DashboardPage() {
           {user?.payment_status === 'pending' && (
             <Card className="bg-yellow-500/10 border border-yellow-500">
               <p className="text-yellow-500 font-semibold mb-2">Payment Required</p>
+
               <p className="text-gray-300 text-sm">
                 Complete your ₦5,000 registration payment to activate your account and participate in the tournament.
               </p>
+              <button
+                type="submit"
+                className="w-full py-3 rounded-lg font-semibold transition-all">
+              </button>
             </Card>
           )}
         </div>

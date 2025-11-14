@@ -123,5 +123,6 @@ export default function DashboardPage() {
 
       <Tabs tabs={tabs} defaultTab="newsfeed" />
     </div>
+    // Hello My name is Muhammad, I'm a programmer 
   );
 }

@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import FixturesPage from './pages/FixturesPage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import PaymentPage from './pages/PaymentPage';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -22,6 +23,11 @@ function App() {
               <PrivateRoute>
                 <DashboardPage />
               </PrivateRoute>    
+            } />
+            <Route path="/payment" element={
+              // <PrivateRoute>
+                <PaymentPage />
+              // </PrivateRoute>
             } />
             <Route path="/fixtures" element={<FixturesPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />

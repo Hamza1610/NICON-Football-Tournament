@@ -9,6 +9,7 @@ import FixturesPage from './pages/FixturesPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import PaymentPage from './pages/PaymentPage';
 import PrivateRoute from './components/PrivateRoute';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               // </PrivateRoute>
             } />
             <Route path="/fixtures" element={<FixturesPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
           </Routes>
         </Layout>

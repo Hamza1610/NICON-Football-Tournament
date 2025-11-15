@@ -26,6 +26,7 @@ export function initUserModel(sequelize: Sequelize) {
         type: DataTypes.UUID,
         primaryKey: true,
         allowNull: false,
+        defaultValue: DataTypes.UUIDV4,
       },
       full_name: {
         type: DataTypes.TEXT,

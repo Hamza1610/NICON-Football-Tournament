@@ -1,0 +1,1183 @@
+{
+	"info": {
+		"_postman_id": "NICON-Football-Tournament-Collection",
+		"name": "NICON Football Tournament API",
+		"description": "API for managing a football tournament, including users, teams, matches, events, payments, and admin functions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Configuration",
+			"item": [
+				{
+					"name": "Set Base URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Example: pm.environment.set(\"BASE_URL\", \"http://localhost:3001/api\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/health",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Configure the BASE_URL variable in your Postman environment to point to your backend server (e.g., http://localhost:3001/api). This request helps verify the base URL is set correctly."
+					},
+					"response": []
+				}
+			],
+			"description": "Configure the base URL for the API.",
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User (Fan)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"Fan One\",\n  \"email\": \"fan1@example.com\",\n  \"role\": \"fan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Public endpoint to register a new user as a 'fan'. Role can be 'fan', 'player', or 'admin'. Other fields like team_id, position, etc., are optional."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (Player)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"Player One\",\n  \"email\": \"player1@example.com\",\n  \"role\": \"player\",\n  \"position\": \"Forward\",\n  \"jersey_number\": 10,\n  \"age\": 25\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Public endpoint to register a new user as a 'player'. Includes optional fields specific to players like position, jersey number, and age."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"Admin One\",\n  \"email\": \"admin1@example.com\",\n  \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Public endpoint to register a new user as an 'admin'."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/users/{{USER_ID_TO_FETCH}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"{{USER_ID_TO_FETCH}}"
+							]
+						},
+						"description": "Public endpoint to retrieve details of a specific user by their ID. Includes associated team info if available."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User (Requires Auth)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/users/me",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						},
+						"description": "Authenticated endpoint. Requires a valid JWT token in the Authorization header (Bearer Token). Returns the details of the currently authenticated user."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users (Filter by Role)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/users?role=player",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "player"
+								}
+							]
+						},
+						"description": "Public endpoint to retrieve a list of users. Can optionally filter by role (e.g., ?role=player)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User (Self or Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"Fan One Updated\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/users/{{USER_ID_TO_UPDATE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"{{USER_ID_TO_UPDATE}}"
+							]
+						},
+						"description": "Authenticated endpoint. Allows a user to update their own profile if the token matches the user ID, or an admin can update any user. Requires a valid JWT token and user ID in the path."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/users/{{USER_ID_TO_DELETE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"{{USER_ID_TO_DELETE}}"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid JWT token belonging to an admin user. Deletes the user specified by the ID in the path."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Teams",
+			"item": [
+				{
+					"name": "Get All Teams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/teams",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"teams"
+							]
+						},
+						"description": "Public endpoint to retrieve a list of all teams."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Team by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/teams/{{TEAM_ID_TO_FETCH}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"teams",
+								"{{TEAM_ID_TO_FETCH}}"
+							]
+						},
+						"description": "Public endpoint to retrieve details of a specific team by its ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Team (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Team Alpha\",\n  \"logo_url\": \"https://example.com/logo_alpha.png\",\n  \"team_group\": \"A\",\n  \"coach_name\": \"Coach Alpha\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/teams",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"teams"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Creates a new team."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Team (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Team Alpha Updated\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/teams/{{TEAM_ID_TO_UPDATE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"teams",
+								"{{TEAM_ID_TO_UPDATE}}"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Updates the team specified by the ID in the path."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Team (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/teams/{{TEAM_ID_TO_DELETE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"teams",
+								"{{TEAM_ID_TO_DELETE}}"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Deletes the team specified by the ID in the path."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Matches",
+			"item": [
+				{
+					"name": "Get All Matches",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/matches",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches"
+							]
+						},
+						"description": "Public endpoint to retrieve a list of all matches. Includes associated team details."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Match by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/matches/{{MATCH_ID_TO_FETCH}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches",
+								"{{MATCH_ID_TO_FETCH}}"
+							]
+						},
+						"description": "Public endpoint to retrieve details of a specific match by its ID. Includes associated team details."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Matches by Group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/matches/group/A",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches",
+								"group",
+								"A"
+							]
+						},
+						"description": "Public endpoint to retrieve matches belonging to a specific group (A, B, final)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Match (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"team_a_id\": \"{{TEAM_A_ID}}\",\n  \"team_b_id\": \"{{TEAM_B_ID}}\",\n  \"date\": \"2025-11-20T15:00:00Z\",\n  \"match_group\": \"A\",\n  \"venue\": \"Stadium One\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/matches",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Creates a new match between two teams."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Match (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"live\",\n  \"score_a\": 1,\n  \"score_b\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/matches/{{MATCH_ID_TO_UPDATE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches",
+								"{{MATCH_ID_TO_UPDATE}}"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Updates the match specified by the ID in the path (e.g., changing status, score)."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Match Events",
+			"item": [
+				{
+					"name": "Get Events by Match ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/matches/{{MATCH_ID_FOR_EVENTS}}/events",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches",
+								"{{MATCH_ID_FOR_EVENTS}}",
+								"events"
+							]
+						},
+						"description": "Public endpoint to retrieve all events (goals, cards, etc.) for a specific match."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Match Event (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"match_id\": \"{{MATCH_ID_FOR_EVENT}}\",\n  \"player_id\": \"{{PLAYER_ID_FOR_EVENT}}\",\n  \"event_type\": \"goal\",\n  \"minute\": 45,\n  \"description\": \"Amazing header goal!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/matches/{{MATCH_ID_FOR_EVENT}}/events",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"matches",
+								"{{MATCH_ID_FOR_EVENT}}",
+								"events"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Creates a new event (goal, assist, card) for a specific match and player. This automatically updates the leaderboard."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Leaderboard",
+			"item": [
+				{
+					"name": "Get Top Players (Leaderboard)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/leaderboard?limit=10",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leaderboard"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Public endpoint to retrieve the top players based on points. The 'limit' query parameter controls how many players are returned."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Player Stats by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/leaderboard/player/{{PLAYER_ID_TO_FETCH_STATS}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"leaderboard",
+								"player",
+								"{{PLAYER_ID_TO_FETCH_STATS}}"
+							]
+						},
+						"description": "Public endpoint to retrieve the individual stats (goals, assists, cards, points) for a specific player."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Create Payment (User Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{USER_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 5000,\n  \"transaction_ref\": \"TXN123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/payments",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"payments"
+							]
+						},
+						"description": "Authenticated endpoint for users. Requires a valid user JWT token. Creates a new payment record with status 'pending'. The user_id is automatically set from the token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment by ID (User or Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{USER_AUTH_TOKEN}}", 
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/payments/{{PAYMENT_ID_TO_FETCH}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"payments",
+								"{{PAYMENT_ID_TO_FETCH}}"
+							]
+						},
+						"description": "Authenticated endpoint. Requires a valid JWT token. A user can only fetch their own payment, while an admin can fetch any payment."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Payments (Admin Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/payments/pending",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"payments",
+								"pending"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Retrieves a list of all payments with status 'pending'."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Payment (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/payments/{{PAYMENT_ID_TO_VERIFY}}/verify",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"payments",
+								"{{PAYMENT_ID_TO_VERIFY}}",
+								"verify"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Updates the specified payment's status to 'verified' and sets the user's payment status to 'verified'."
+					},
+					"response": []
+				},
+				{
+					"name": "Fail Payment (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/payments/{{PAYMENT_ID_TO_FAIL}}/fail",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"payments",
+								"{{PAYMENT_ID_TO_FAIL}}",
+								"fail"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Updates the specified payment's status to 'failed' and sets the user's payment status to 'failed'."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/posts",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"posts"
+							]
+						},
+						"description": "Public endpoint to retrieve a list of all announcements/posts, sorted by creation date (newest first). Includes the author's name."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/posts/{{POST_ID_TO_FETCH}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"posts",
+								"{{POST_ID_TO_FETCH}}"
+							]
+						},
+						"description": "Public endpoint to retrieve details of a specific announcement/post."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Post (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Tournament Update\",\n  \"content\": \"The first round of matches starts next week!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/posts",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"posts"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Creates a new announcement/post."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Tournament Update\",\n  \"content\": \"The first round of matches starts next week! Venue details coming soon.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/posts/{{POST_ID_TO_UPDATE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"posts",
+								"{{POST_ID_TO_UPDATE}}"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Updates the post specified by the ID in the path."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/posts/{{POST_ID_TO_DELETE}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"posts",
+								"{{POST_ID_TO_DELETE}}"
+							]
+						},
+						"description": "Admin-only endpoint. Requires a valid admin JWT token. Deletes the post specified by the ID in the path."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {},
+			"_postman_isSubFolder": true
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/health",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Public endpoint to check the health status of the server."
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{AUTH_TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:3001/api",
+			"type": "string",
+			"description": "The base URL of your backend API (e.g., http://localhost:3001/api)"
+		},
+		{
+			"key": "AUTH_TOKEN",
+			"value": "",
+			"type": "string",
+			"description": "JWT token for a regular user"
+		},
+		{
+			"key": "ADMIN_AUTH_TOKEN",
+			"value": "",
+			"type": "string",
+			"description": "JWT token for an admin user"
+		},
+		{
+			"key": "USER_ID_TO_FETCH",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a user to fetch"
+		},
+		{
+			"key": "USER_ID_TO_UPDATE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a user to update (should match token user or be admin)"
+		},
+		{
+			"key": "USER_ID_TO_DELETE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a user to delete (admin only)"
+		},
+		{
+			"key": "TEAM_ID_TO_FETCH",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a team to fetch"
+		},
+		{
+			"key": "TEAM_ID_TO_UPDATE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a team to update (admin only)"
+		},
+		{
+			"key": "TEAM_ID_TO_DELETE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a team to delete (admin only)"
+		},
+		{
+			"key": "TEAM_A_ID",
+			"value": "",
+			"type": "string",
+			"description": "UUID of Team A for a match"
+		},
+		{
+			"key": "TEAM_B_ID",
+			"value": "",
+			"type": "string",
+			"description": "UUID of Team B for a match"
+		},
+		{
+			"key": "MATCH_ID_TO_FETCH",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a match to fetch"
+		},
+		{
+			"key": "MATCH_ID_TO_UPDATE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a match to update (admin only)"
+		},
+		{
+			"key": "MATCH_ID_FOR_EVENTS",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a match to get events for"
+		},
+		{
+			"key": "MATCH_ID_FOR_EVENT",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a match to add an event to (admin only)"
+		},
+		{
+			"key": "PLAYER_ID_FOR_EVENT",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a player involved in an event (admin only)"
+		},
+		{
+			"key": "PLAYER_ID_TO_FETCH_STATS",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a player to fetch stats for"
+		},
+		{
+			"key": "PAYMENT_ID_TO_FETCH",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a payment to fetch"
+		},
+		{
+			"key": "PAYMENT_ID_TO_VERIFY",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a payment to verify (admin only)"
+		},
+		{
+			"key": "PAYMENT_ID_TO_FAIL",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a payment to fail (admin only)"
+		},
+		{
+			"key": "POST_ID_TO_FETCH",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a post to fetch"
+		},
+		{
+			"key": "POST_ID_TO_UPDATE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a post to update (admin only)"
+		},
+		{
+			"key": "POST_ID_TO_DELETE",
+			"value": "",
+			"type": "string",
+			"description": "UUID of a post to delete (admin only)"
+		}
+	]
+}
